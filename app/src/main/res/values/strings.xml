@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">CFT_Test</string>
+    <string name="name">Имя</string>
+    <string name="surname">Фамилия</string>
+    <string name="password">Пароль</string>
+    <string name="confirm_password">Подтвердите пароль</string>
+    <string name="sign_up">Регистрация</string>
+    <string name="date">Дата рождения</string>
+    <string name="password_rule_six_symbols">Пароль должен содержать не менее 6 символов!</string>
+    <string name="password_rule_contains_number">Пароль должен содержать цифры</string>
+    <string name="password_rule_all_character_cases">Пароль должен содержать буквы верхнего и нижнего регистра</string>
+    <string name="name_rule_2_symbols">Минимум 2 символа</string>
+</resources>
