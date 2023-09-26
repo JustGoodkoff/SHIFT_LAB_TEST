@@ -88,7 +88,8 @@ class MainActivity : AppCompatActivity() {
                 timer = object : CountDownTimer(500, 500) {
                     override fun onTick(millisUntilFinished: Long) {}
                     override fun onFinish() {
-                        isNameValid = binding.name.validateName(binding.nameLayout)
+                        isNameValid =
+                            viewModel.validateName(binding.name.text.toString(), binding.nameLayout)
                         validateAllData(
                             binding.registrationButton, isNameValid, isSurnameValid,
                             isPasswordValid, isConfirmPasswordValid, isDateValid
@@ -108,7 +109,10 @@ class MainActivity : AppCompatActivity() {
                 timer = object : CountDownTimer(500, 500) {
                     override fun onTick(millisUntilFinished: Long) {}
                     override fun onFinish() {
-                        isSurnameValid = binding.surname.validateName(binding.surnameLayout)
+                        isSurnameValid = viewModel.validateName(
+                            binding.surname.text.toString(),
+                            binding.surnameLayout
+                        )
                         validateAllData(
                             binding.registrationButton, isNameValid, isSurnameValid,
                             isPasswordValid, isConfirmPasswordValid, isDateValid
@@ -128,7 +132,8 @@ class MainActivity : AppCompatActivity() {
                 timer = object : CountDownTimer(500, 500) {
                     override fun onTick(millisUntilFinished: Long) {}
                     override fun onFinish() {
-                        isDateValid = binding.date.validateDate(binding.dateLayout)
+                        isDateValid =
+                            viewModel.validateDate(binding.date.text.toString(), binding.dateLayout)
                         validateAllData(
                             binding.registrationButton, isNameValid, isSurnameValid,
                             isPasswordValid, isConfirmPasswordValid, isDateValid
@@ -147,7 +152,10 @@ class MainActivity : AppCompatActivity() {
                 timer = object : CountDownTimer(500, 500) {
                     override fun onTick(millisUntilFinished: Long) {}
                     override fun onFinish() {
-                        isPasswordValid = binding.password.validatePassword(binding.passwordLayout)
+                        isPasswordValid = viewModel.validatePassword(
+                            binding.password.text.toString(),
+                            binding.passwordLayout
+                        )
                         validateAllData(
                             binding.registrationButton, isNameValid, isSurnameValid,
                             isPasswordValid, isConfirmPasswordValid, isDateValid
@@ -167,9 +175,10 @@ class MainActivity : AppCompatActivity() {
                     override fun onTick(millisUntilFinished: Long) {}
                     override fun onFinish() {
                         isConfirmPasswordValid =
-                            binding.confirmPassword.validateConfirmPassword(
-                                binding.confirmPasswordLayout,
-                                binding.password
+                            viewModel.validateConfirmPassword(
+                                binding.confirmPassword.text.toString(),
+                                binding.password.text.toString(),
+                                binding.confirmPasswordLayout
                             )
                         validateAllData(
                             binding.registrationButton, isNameValid, isSurnameValid,
@@ -182,84 +191,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    // функции валидации введенных данных
-
     private fun validateAllData(regButton: MaterialButton, vararg isValid: Boolean) {
         regButton.isEnabled = isValid.all { it }
-    }
-
-    private fun TextInputEditText.validatePassword(passwordLayout: TextInputLayout): Boolean {
-        if (this.text.toString().isNotEmpty()) {
-            if (this.text.toString().length < 6) {
-                passwordLayout.error = context.getString(R.string.password_rule_six_symbols)
-            } else if (!this.text.toString().any { it.isDigit() }) {
-                passwordLayout.error = context.getString(R.string.password_rule_contains_number)
-            } else if (!(this.text.toString().any { it.isUpperCase() }
-                        && this.text.toString().any { it.isLowerCase() })
-            ) {
-                passwordLayout.error =
-                    context.getString(R.string.password_rule_all_character_cases)
-            } else {
-                passwordLayout.error = null
-                return true
-            }
-        } else {
-            passwordLayout.error = null
-        }
-        return false
-    }
-
-    private fun TextInputEditText.validateName(nameLayout: TextInputLayout): Boolean {
-        if (!this.text.isNullOrEmpty()) {
-            if (this.text.toString().length < 2) {
-                nameLayout.error = context.getString(R.string.name_rule_2_symbols)
-            } else {
-                nameLayout.error = null
-                return true
-            }
-        } else {
-            nameLayout.error = null
-        }
-        return false
-    }
-
-
-    private fun TextInputEditText.validateDate(dateLayout: TextInputLayout): Boolean {
-        if (!this.text.isNullOrEmpty()) {
-            val parsedDate: Date?
-            try {
-                val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                format.isLenient = false
-                parsedDate = format.parse(this.text.toString())
-                if (parsedDate.after(Date())) {
-                    dateLayout.error = context.getString(R.string.wrong_date)
-                } else {
-                    dateLayout.error = null
-                    return true
-                }
-            } catch (_: ParseException) {
-                dateLayout.error = context.getString(R.string.incorrect_date_format)
-            }
-        } else {
-            dateLayout.error = null
-        }
-        return false
-    }
-
-    private fun TextInputEditText.validateConfirmPassword(
-        confirmPasswordLayout: TextInputLayout,
-        password: TextInputEditText
-    ): Boolean {
-        if (this.text.toString().isNotEmpty()) {
-            if (this.text.toString() == password.text.toString()) {
-                confirmPasswordLayout.error = null
-                return true
-            } else {
-                confirmPasswordLayout.error = context.getString(R.string.different_passwords)
-            }
-        } else {
-            confirmPasswordLayout.error = null
-        }
-        return false
     }
 }
