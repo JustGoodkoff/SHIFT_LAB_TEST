@@ -10,4 +10,13 @@
     <string name="password_rule_contains_number">Пароль должен содержать цифры</string>
     <string name="password_rule_all_character_cases">Пароль должен содержать буквы верхнего и нижнего регистра</string>
     <string name="name_rule_2_symbols">Минимум 2 символа</string>
+    <string name="greeting">Приветствие</string>
+    <string name="exit">Выйти</string>
+    <string name="choose_date_of_birth">Выберите дату рождения</string>
+    <string name="date_format">dd.MM.yyyy</string>
+    <string name="different_passwords">Пароли не совпадают!</string>
+    <string name="incorrect_date_format">Некорректный формат даты</string>
+    <string name="wrong_date">Указана дата после сегодняшней</string>
+    <string name="rule_surname_minimum_2_symbols">Фамилия должна содержать не менее 2 букв</string>
+    <string name="rule_name_minimum_2_symbols">Имя должно содержать не менее 2 букв</string>
 </resources>

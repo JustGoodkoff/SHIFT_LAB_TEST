@@ -1,11 +1,12 @@
 package com.example.cft_test
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.cft_test.databinding.ActivityMainBinding
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.CalendarConstraints
@@ -20,13 +21,22 @@ import java.util.Date
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 
-        // кнопка регистрации будет разблокирована только тогда, когда все данные буду валидны
+        viewModel =
+            ViewModelProvider(this, MainViewModelFactory(this)).get(MainViewModel::class.java)
+        if (viewModel.checkIfUserExists()) {
+            val intent = Intent(this@MainActivity, GreetingActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         var isNameValid = false
         var isSurnameValid = false
         var isDateValid = false
@@ -34,24 +44,39 @@ class MainActivity : AppCompatActivity() {
         var isConfirmPasswordValid = false
         binding.registrationButton.isEnabled = false
 
+        binding.registrationButton.setOnClickListener {
+            viewModel.createUser(
+                binding.name.text.toString(),
+                binding.surname.text.toString(),
+                binding.date.text.toString(),
+                binding.password.text.toString()
+            )
+            val intent = Intent(this@MainActivity, GreetingActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         val constraints =
             CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now())
 
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
+                .setTitleText(getString(R.string.choose_date_of_birth))
                 .setCalendarConstraints(constraints.build())
                 .build()
 
         datePicker.addOnPositiveButtonClickListener {
             val instant = Instant.ofEpochMilli(datePicker.selection!!)
             binding.date.setText(
-                SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date.from(instant))
+                SimpleDateFormat(
+                    getString(R.string.date_format),
+                    Locale.getDefault()
+                ).format(Date.from(instant))
             )
         }
 
         binding.dateLayout.setEndIconOnClickListener {
-            datePicker.show(supportFragmentManager, "123")
+            datePicker.show(supportFragmentManager, "")
         }
 
         binding.name.addTextChangedListener(object : TextWatcher {
@@ -142,7 +167,10 @@ class MainActivity : AppCompatActivity() {
                     override fun onTick(millisUntilFinished: Long) {}
                     override fun onFinish() {
                         isConfirmPasswordValid =
-                            binding.confirmPassword.validateConfirmPassword(binding.confirmPasswordLayout, binding.password)
+                            binding.confirmPassword.validateConfirmPassword(
+                                binding.confirmPasswordLayout,
+                                binding.password
+                            )
                         validateAllData(
                             binding.registrationButton, isNameValid, isSurnameValid,
                             isPasswordValid, isConfirmPasswordValid, isDateValid
@@ -157,14 +185,7 @@ class MainActivity : AppCompatActivity() {
     // функции валидации введенных данных
 
     private fun validateAllData(regButton: MaterialButton, vararg isValid: Boolean) {
-        for (i in isValid) {
-            if (!i) {
-                regButton.isEnabled = false
-                return
-            }
-        }
-        regButton.isEnabled = true
-        Log.e("234", isValid.all { true }.toString())
+        regButton.isEnabled = isValid.all { it }
     }
 
     private fun TextInputEditText.validatePassword(passwordLayout: TextInputLayout): Boolean {
@@ -190,7 +211,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun TextInputEditText.validateName(nameLayout: TextInputLayout): Boolean {
         if (!this.text.isNullOrEmpty()) {
-            if (this.text!!.length < 2) {
+            if (this.text.toString().length < 2) {
                 nameLayout.error = context.getString(R.string.name_rule_2_symbols)
             } else {
                 nameLayout.error = null
@@ -211,13 +232,13 @@ class MainActivity : AppCompatActivity() {
                 format.isLenient = false
                 parsedDate = format.parse(this.text.toString())
                 if (parsedDate.after(Date())) {
-                    dateLayout.error = "Указана дата после сегодняшней"
+                    dateLayout.error = context.getString(R.string.wrong_date)
                 } else {
                     dateLayout.error = null
                     return true
                 }
             } catch (_: ParseException) {
-                dateLayout.error = "Некорректный формат даты"
+                dateLayout.error = context.getString(R.string.incorrect_date_format)
             }
         } else {
             dateLayout.error = null
@@ -234,7 +255,7 @@ class MainActivity : AppCompatActivity() {
                 confirmPasswordLayout.error = null
                 return true
             } else {
-                confirmPasswordLayout.error = "Пароли не совпадают!"
+                confirmPasswordLayout.error = context.getString(R.string.different_passwords)
             }
         } else {
             confirmPasswordLayout.error = null

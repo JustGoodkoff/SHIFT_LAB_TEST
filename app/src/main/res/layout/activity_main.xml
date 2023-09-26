@@ -18,7 +18,7 @@
         android:layout_marginRight="20dp"
         android:hint="@string/name"
         app:errorEnabled="true"
-        app:helperText="Имя должно содержать не менее 3 букв"
+        app:helperText="@string/rule_name_minimum_2_symbols"
         app:helperTextEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -41,7 +41,7 @@
         android:layout_marginRight="20dp"
         app:errorEnabled="true"
 
-        app:helperText="Фамилия должна содержать не менее 3 букв">
+        app:helperText="@string/rule_surname_minimum_2_symbols">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/surname"
